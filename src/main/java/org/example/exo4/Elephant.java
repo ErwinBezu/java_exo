@@ -2,8 +2,7 @@ package org.example.exo4;
 
 class Elephant extends Animal {
     private double poids;
-
-    public Elephant(String nom, int age, double poids) {
+        public Elephant(String nom, int age, double poids) {
         super(nom, age);
         this.poids = poids;
     }

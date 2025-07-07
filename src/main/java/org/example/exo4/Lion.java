@@ -1,7 +1,6 @@
 package org.example.exo4;
 
 class Lion extends Animal {
-
     public Lion(String nom, int age) {
         super(nom, age);
     }
