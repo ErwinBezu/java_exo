@@ -17,7 +17,6 @@ public class CustomerService extends BaseCrudService<Customer> {
     @Override
     public void create(Customer customer) {
         customerRepository.save(customer);
-        logSuccess("created", getEntityIdentifier(customer));
     }
 
     @Override
@@ -38,19 +37,12 @@ public class CustomerService extends BaseCrudService<Customer> {
     public void update(int id, Customer updatedCustomer) throws NotFoundException {
         Customer existingCustomer = getById(id);
         updateCustomerFields(existingCustomer, updatedCustomer);
-        logSuccess("updated", getEntityIdentifier(existingCustomer));
     }
 
     @Override
     public void delete(int id) throws NotFoundException {
         Customer customer = getById(id);
         customerRepository.deleteById(id);
-        logSuccess("deleted", getEntityIdentifier(customer));
-    }
-
-    @Override
-    protected String getEntityIdentifier(Customer customer) {
-        return customer.getFirstName() + " " + customer.getLastName();
     }
 
     private void updateCustomerFields(Customer existing, Customer updated) {

@@ -4,7 +4,6 @@ import org.example.tp_billetterie.Entity.*;
 import org.example.tp_billetterie.Enum.SeatType;
 import org.example.tp_billetterie.Exception.NotFoundException;
 import org.example.tp_billetterie.Service.*;
-import org.example.tp_billetterie.Validator.SeatAvailabilityValidator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -35,18 +34,19 @@ public class TicketController extends BaseController<Ticket> {
     protected void performCreate() {
         printCreateHeader();
 
-        Customer customer = selectCustomer();
-        Event event = selectEvent();
-        int seatNumber = promptForInt("Enter seat number");
-        SeatAvailabilityValidator.validateSeat(event, seatNumber);
-        SeatType seatType = selectSeatType();
+        try {
+            Customer customer = selectCustomer();
+            Event event = selectEvent();
+            int seatNumber = promptForInt("Enter seat number");
+            SeatType seatType = selectSeatType();
 
-        Ticket ticket = new Ticket(seatNumber, customer, event, seatType);
-        ticketService.create(ticket);
-        customer.addTicket(ticket);
-        event.addTicket(ticket);
+            Ticket ticket = ticketService.createTicketWithValidation(customer.getId(), event.getId(), seatNumber, seatType);
 
-        System.out.println("Ticket reserved successfully: " + ticket);
+            System.out.println("Ticket reserved successfully: " + ticket);
+
+        } catch (Exception e) {
+            System.out.println("Reservation failed: " + e.getMessage());
+        }
     }
 
     @Override
@@ -59,6 +59,7 @@ public class TicketController extends BaseController<Ticket> {
     @Override
     protected void performReadById() throws NotFoundException {
         int id = promptForId("display");
+
         Ticket ticket = ticketService.getById(id);
 
         printReadByIdHeader();
@@ -71,45 +72,55 @@ public class TicketController extends BaseController<Ticket> {
     @Override
     protected void performUpdate() throws NotFoundException {
         int id = promptForId("update");
+
         Ticket existingTicket = ticketService.getById(id);
+
         System.out.println("Current ticket: " + existingTicket);
 
-        int seatNumber = promptForInt("New seat number (current: " + existingTicket.getSeatNumber() + ")");
-        SeatAvailabilityValidator.validateSeat(existingTicket.getEvent(), seatNumber);
-        SeatType seatType = selectSeatType();
+        try {
+            int seatNumber = promptForInt("New seat number (current: " + existingTicket.getSeatNumber() + ")");
+            SeatType seatType = selectSeatType();
 
-        existingTicket.setSeatNumber(seatNumber);
-        existingTicket.setSeatType(seatType);
-        printSuccessMessage("updated");
+            ticketService.updateTicketWithValidation(id, seatNumber, seatType);
+
+            printSuccessMessage("updated");
+
+        } catch (Exception e) {
+            System.out.println(" Update failed: " + e.getMessage());
+        }
     }
 
     @Override
     protected void performDelete() throws NotFoundException {
         int id = promptForId("cancel");
-        Ticket ticket = ticketService.getById(id);
 
-        ticket.getCustomer().removeTicket(ticket);
-        ticket.getEvent().removeTicket(ticket);
         ticketService.delete(id);
+
         System.out.println("Ticket cancelled successfully!");
     }
 
     private Customer selectCustomer() throws NotFoundException {
         System.out.println("\nAvailable customers:");
+
         List<Customer> customers = customerService.getAll();
+
         for (Customer customer : customers) {
             System.out.println("  " + customer);
         }
+
         int customerId = promptForInt("Enter customer ID");
         return customerService.getById(customerId);
     }
 
     private Event selectEvent() throws NotFoundException {
         System.out.println("\nAvailable events:");
+
         List<Event> events = eventService.getAll();
+
         for (Event event : events) {
             System.out.println("  " + event);
         }
+
         int eventId = promptForInt("Enter event ID");
         return eventService.getById(eventId);
     }

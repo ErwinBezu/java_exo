@@ -17,7 +17,6 @@ public class EventService extends BaseCrudService<Event> {
     @Override
     public void create(Event event) {
         eventRepository.save(event);
-        logSuccess("created", getEntityIdentifier(event));
     }
 
     @Override
@@ -36,21 +35,14 @@ public class EventService extends BaseCrudService<Event> {
 
     @Override
     public void update(int id, Event updatedEvent) throws NotFoundException {
-        Event existingEvent = getById(id);
+        Event existingEvent = getById(id); // Vérifie existence
         updateEventFields(existingEvent, updatedEvent);
-        logSuccess("updated", getEntityIdentifier(existingEvent));
     }
 
     @Override
     public void delete(int id) throws NotFoundException {
         Event event = getById(id);
         eventRepository.deleteById(id);
-        logSuccess("deleted", getEntityIdentifier(event));
-    }
-
-    @Override
-    protected String getEntityIdentifier(Event event) {
-        return event.getName();
     }
 
     private void updateEventFields(Event existing, Event updated) {

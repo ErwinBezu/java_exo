@@ -54,7 +54,9 @@ public class EventController extends BaseController<Event> {
         int numberOfSeats = promptForInt("Number of seats");
 
         Event event = new Event(name, venue, date, time, numberOfSeats);
+
         eventService.create(event);
+
         printSuccessMessage("created");
     }
 
@@ -68,6 +70,7 @@ public class EventController extends BaseController<Event> {
     @Override
     protected void performReadById() throws NotFoundException {
         int id = promptForId("display");
+
         Event event = eventService.getById(id);
 
         printReadByIdHeader();
@@ -78,7 +81,9 @@ public class EventController extends BaseController<Event> {
     @Override
     protected void performUpdate() throws NotFoundException {
         int id = promptForId("update");
+
         Event existingEvent = eventService.getById(id);
+
         System.out.println("Current event: " + existingEvent);
 
         String name = promptForStringWithDefault("event name", existingEvent.getName());
@@ -88,13 +93,16 @@ public class EventController extends BaseController<Event> {
         int numberOfSeats = promptForSeatsWithValidation(existingEvent);
 
         Event updatedEvent = new Event(name, newVenue, date, time, numberOfSeats);
+
         eventService.update(id, updatedEvent);
+
         printSuccessMessage("updated");
     }
 
     @Override
     protected void performDelete() throws NotFoundException {
         int id = promptForId("delete");
+
         Event event = eventService.getById(id);
 
         if (!validateDeletionWithTickets(event.getTicketList().size())) {
@@ -102,6 +110,7 @@ public class EventController extends BaseController<Event> {
         }
 
         eventService.delete(id);
+
         printSuccessMessage("deleted");
     }
 
@@ -146,13 +155,14 @@ public class EventController extends BaseController<Event> {
                 return newSeats;
 
             } catch (NumberFormatException e) {
-                System.out.println(" Please enter a valid number!");
+                System.out.println("Please enter a valid number!");
             }
         }
     }
 
     private void viewEventTickets() throws NotFoundException {
         int id = promptForId("view tickets");
+
         Event event = eventService.getById(id);
         List<Ticket> tickets = eventService.getEventTickets(id);
 

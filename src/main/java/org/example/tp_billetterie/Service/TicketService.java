@@ -24,7 +24,6 @@ public class TicketService extends BaseCrudService<Ticket> {
     @Override
     public void create(Ticket ticket) {
         ticketRepository.save(ticket);
-        logSuccess("created", getEntityIdentifier(ticket));
     }
 
     @Override
@@ -43,9 +42,8 @@ public class TicketService extends BaseCrudService<Ticket> {
 
     @Override
     public void update(int id, Ticket updatedTicket) throws NotFoundException {
-        Ticket existingTicket = getById(id);
+        Ticket existingTicket = getById(id); // Vérifie existence
         updateTicketFields(existingTicket, updatedTicket);
-        logSuccess("updated", getEntityIdentifier(existingTicket));
     }
 
     @Override
@@ -56,12 +54,6 @@ public class TicketService extends BaseCrudService<Ticket> {
         ticket.getEvent().removeTicket(ticket);
 
         ticketRepository.deleteById(id);
-        logSuccess("deleted", getEntityIdentifier(ticket));
-    }
-
-    @Override
-    protected String getEntityIdentifier(Ticket ticket) {
-        return "ID: " + ticket.getId() + " (Seat " + ticket.getSeatNumber() + ")";
     }
 
     private void updateTicketFields(Ticket existing, Ticket updated) {
@@ -69,35 +61,26 @@ public class TicketService extends BaseCrudService<Ticket> {
         existing.setSeatType(updated.getSeatType());
     }
 
-    public void createTicket(int customerId, int eventId, int seatNumber, SeatType seatType)
+    public Ticket createTicketWithValidation(int customerId, int eventId, int seatNumber, SeatType seatType)
             throws NotFoundException {
-        try {
-            Customer customer = customerService.getById(customerId);
-            Event event = eventService.getById(eventId);
 
-            SeatAvailabilityValidator.validateSeat(event, seatNumber);
+        Customer customer = customerService.getById(customerId);
+        Event event = eventService.getById(eventId);
 
-            Ticket ticket = new Ticket(seatNumber, customer, event, seatType);
+        SeatAvailabilityValidator.validateSeat(event, seatNumber);
 
-            ticketRepository.save(ticket);
-            customer.addTicket(ticket);
-            event.addTicket(ticket);
+        Ticket ticket = new Ticket(seatNumber, customer, event, seatType);
 
-            System.out.println("Ticket reserved successfully: " + ticket);
-
-        } catch (RuntimeException e) {
-            System.out.println("Reservation failed: " + e.getMessage());
-            throw e;
-        }
+        ticketRepository.save(ticket);
+        customer.addTicket(ticket);
+        event.addTicket(ticket);
+        return ticket;
     }
 
-    public void updateTicket(int id, int seatNumber, SeatType seatType) throws NotFoundException {
+    public void updateTicketWithValidation(int id, int seatNumber, SeatType seatType) throws NotFoundException {
         Ticket ticket = getById(id);
-
         SeatAvailabilityValidator.validateSeat(ticket.getEvent(), seatNumber);
-
         ticket.setSeatNumber(seatNumber);
         ticket.setSeatType(seatType);
-        logSuccess("updated", getEntityIdentifier(ticket));
     }
 }

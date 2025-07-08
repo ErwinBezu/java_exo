@@ -35,20 +35,25 @@ public class CustomerController extends BaseController<Customer> {
         String phoneNumber = promptForString("Phone number");
 
         Customer customer = new Customer(lastName, firstName, address, age, phoneNumber);
+
         customerService.create(customer);
+
         printSuccessMessage("created");
     }
 
     @Override
     protected void performReadAll() {
         printReadAllHeader();
+
         List<Customer> customers = customerService.getAll();
+
         printEntitiesList(customers);
     }
 
     @Override
     protected void performReadById() throws NotFoundException {
         int id = promptForId("display");
+
         Customer customer = customerService.getById(id);
 
         printReadByIdHeader();
@@ -68,7 +73,9 @@ public class CustomerController extends BaseController<Customer> {
     @Override
     protected void performUpdate() throws NotFoundException {
         int id = promptForId("update");
+
         Customer existingCustomer = customerService.getById(id);
+
         System.out.println("Current customer: " + existingCustomer);
 
         String firstName = promptForStringWithDefault("first name", existingCustomer.getFirstName());
@@ -78,19 +85,21 @@ public class CustomerController extends BaseController<Customer> {
         String phoneNumber = promptForStringWithDefault("phone number", existingCustomer.getPhoneNumber());
 
         Customer updatedCustomer = new Customer(lastName, firstName, newAddress, age, phoneNumber);
+
         customerService.update(id, updatedCustomer);
+
         printSuccessMessage("updated");
     }
 
     @Override
     protected void performDelete() throws NotFoundException {
         int id = promptForId("delete");
+
         Customer customer = customerService.getById(id);
 
         if (!validateDeletionWithTickets(customer.getTicketList().size())) {
             return;
         }
-
         customerService.delete(id);
         printSuccessMessage("deleted");
     }
