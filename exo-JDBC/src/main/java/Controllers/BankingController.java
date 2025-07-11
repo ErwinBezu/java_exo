@@ -96,40 +96,6 @@ public class BankingController {
         }
     }
 
-    public String getAccountDetails(int accountId) {
-        BankAccount account = bankingService.getAccountById(accountId);
-
-        if (account == null) {
-            return "Compte non trouvé avec l'ID: " + accountId;
-        }
-
-        Customer customer = bankingService.getCustomerById(account.getCustomerId());
-
-        if (customer == null) {
-            return "Client associé non trouvé pour le compte: " + accountId;
-        }
-
-        String details =
-                "DETAILS DU COMPTE BANCAIRE\n" +
-                "ID Compte      : " + account.getId() + "\n" +
-                "Titulaire      : " + customer.getFullName() + "\n" +
-                "Téléphone      : " + customer.getPhone() + "\n" +
-                "Solde actuel   : " + String.format("%.2f €", account.getTotalAmount()) + "\n" +
-                "Solde calculé  : " + String.format("%.2f €", account.calculateBalance()) + "\n" +
-                "\nHISTORIQUE DES OPÉRATIONS:\n";
-
-
-        if (account.getOperations().isEmpty()) {
-            details += "   Aucune opération effectuée\n";
-        } else {
-            for (Operation op : account.getOperations()) {
-                String type = op.getStatus() == OperationStatus.DEPOSIT ? " DEPOT" : " RETRAIT";
-                details += String.format("   %s | %.2f € | %s%n", type, op.getAmount(), op.getOperationDate());
-            }
-        }
-        return details;
-    }
-
     public String listCustomerAccounts(int customerId) {
         Customer customer = bankingService.getCustomerById(customerId);
 

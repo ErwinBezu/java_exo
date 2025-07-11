@@ -29,9 +29,8 @@ public class ConsoleInterface {
                     case 2 -> gererDepot();
                     case 3 -> gererRetrait();
                     case 4 -> gererCreationCompteSupplementaire();
-                    case 5 -> gererAffichageCompte();
-                    case 6 -> gererAffichageProfilClient();
-                    case 7 -> {
+                    case 5 -> gererAffichageProfilClient();
+                    case 6 -> {
                         continuer = false;
                         System.out.println(" Merci d'avoir utilisé notre application bancaire !");
                     }
@@ -55,9 +54,8 @@ public class ConsoleInterface {
                 2. Effectuer un dépot
                 3. Effectuer un retrait
                 4. Créer un compte supplémentaire pour un client
-                5. Afficher un compte
-                6. Afficher le profil complet d'un client
-                7. Quitter
+                5. Afficher le profil complet d'un client
+                6. Quitter
                 """);
         System.out.print("\n Votre choix: ");
     }
@@ -145,21 +143,6 @@ public class ConsoleInterface {
 
         } catch (NumberFormatException e) {
             System.out.println("Veuillez entrer des valeurs numériques valides.");
-        }
-    }
-
-    private void gererAffichageCompte() {
-        System.out.println("\n=== AFFICHAGE COMPTE ===");
-
-        try {
-            System.out.print("ID du compte: ");
-            int accountId = Integer.parseInt(scanner.nextLine());
-
-            String details = controller.getAccountDetails(accountId);
-            System.out.println(details);
-
-        } catch (NumberFormatException e) {
-            System.out.println("Veuillez entrer un ID de compte valide.");
         }
     }
 
