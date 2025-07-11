@@ -95,12 +95,12 @@ public class BankingController {
 
         String details =
                 "DETAILS DU COMPTE BANCAIRE\n" +
-                        "ID Compte      : " + account.getId() + "\n" +
-                        " Titulaire      : " + customer.getFullName() + "\n" +
-                        "Téléphone      : " + customer.getPhone() + "\n" +
-                        "Solde actuel   : " + String.format("%.2f €", account.getTotalAmount()) + "\n" +
-                        "Solde calculé  : " + String.format("%.2f €", account.calculateBalance()) + "\n" +
-                        "\nHISTORIQUE DES OPÉRATIONS:\n";
+                "ID Compte      : " + account.getId() + "\n" +
+                "Titulaire      : " + customer.getFullName() + "\n" +
+                "Téléphone      : " + customer.getPhone() + "\n" +
+                "Solde actuel   : " + String.format("%.2f €", account.getTotalAmount()) + "\n" +
+                "Solde calculé  : " + String.format("%.2f €", account.calculateBalance()) + "\n" +
+                "\nHISTORIQUE DES OPÉRATIONS:\n";
 
 
         if (account.getOperations().isEmpty()) {

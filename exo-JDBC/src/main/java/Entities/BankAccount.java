@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class BankAccount {
     private int id;
     private int customerId;
+    private Customer customer;
     private List<Operation> operations = new ArrayList<>();
     private Double totalAmount;
 

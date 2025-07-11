@@ -67,18 +67,38 @@ public class BankAccountDao {
     public BankAccount findById (int id){
         try {
             connection = DataBaseManager.getConnection();
-            request = "SELECT * FROM bank_accounts WHERE id = ?";
+            request = """
+                SELECT 
+                    ba.id as account_id,
+                    ba.customer_id as account_customer_id,
+                    ba.total_amount,
+                    c.id as customer_id,
+                    c.first_name,
+                    c.last_name,
+                    c.phone
+                FROM bank_accounts ba
+                JOIN customers c ON ba.customer_id = c.id
+                WHERE ba.id = ?
+            """;
             stmt = connection.prepareStatement(request);
             stmt.setInt(1,id);
             rs = stmt.executeQuery();
 
             if(rs.next()){
+                Customer customer = Customer.builder()
+                        .id(rs.getInt("customer_id"))
+                        .firstName(rs.getString("first_name"))
+                        .lastName(rs.getString("last_name"))
+                        .phone(rs.getString("phone"))
+                        .build();
+
                 OperationDao operationDao = new OperationDao();
                 List<Operation> operations = operationDao.findByAccountId(id);
 
                 return BankAccount.builder()
-                        .id(rs.getInt("id"))
-                        .customerId(rs.getInt("customer_id"))
+                        .id(rs.getInt("account_id"))
+                        .customerId(rs.getInt("account_customer_id"))
+                        .customer(customer)
                         .operations(operations)
                         .totalAmount(rs.getDouble("total_amount"))
                         .build();
@@ -97,5 +117,4 @@ public class BankAccountDao {
             }
         }
     }
-
 }
