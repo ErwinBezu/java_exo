@@ -8,6 +8,8 @@ import Entities.Customer;
 import Entities.Operation;
 import Enums.OperationStatus;
 
+import java.util.List;
+
 public class BankingService {
 
     private final CustomerDao customerDao;
@@ -53,6 +55,25 @@ public class BankingService {
         }
 
         return -1;
+    }
+
+    public int createAdditionalAccount(int customerId) {
+        try {
+            Customer customer = customerDao.findById(customerId);
+            if (customer == null) {
+                return -1;
+            }
+            BankAccount account = BankAccount.builder()
+                    .customerId(customerId)
+                    .totalAmount(0.0)
+                    .build();
+
+            BankAccount savedAccount = accountDao.create(account);
+            return savedAccount != null ? savedAccount.getId() : -1;
+
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
 
@@ -126,6 +147,14 @@ public class BankingService {
         return false;
     }
 
+    public List<BankAccount> getAccountsByCustomerId(int customerId) {
+        try {
+            return accountDao.findByCustomerId(customerId);
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
     public BankAccount getAccountById(int accountId) {
         try {
             return accountDao.findById(accountId);
@@ -144,6 +173,10 @@ public class BankingService {
 
     public boolean accountExists(int accountId) {
         return getAccountById(accountId) != null;
+    }
+
+    public boolean customerExists(int customerId) {
+        return getCustomerById(customerId) != null;
     }
 
     public double getAccountBalance(int accountId) {

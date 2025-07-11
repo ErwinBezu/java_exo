@@ -28,8 +28,10 @@ public class ConsoleInterface {
                     case 1 -> gererCreationClient();
                     case 2 -> gererDepot();
                     case 3 -> gererRetrait();
-                    case 4 -> gererAffichageCompte();
-                    case 5 -> {
+                    case 4 -> gererCreationCompteSupplementaire();
+                    case 5 -> gererAffichageCompte();
+                    case 6 -> gererAffichageProfilClient();
+                    case 7 -> {
                         continuer = false;
                         System.out.println(" Merci d'avoir utilisé notre application bancaire !");
                     }
@@ -52,8 +54,10 @@ public class ConsoleInterface {
                 1. Créer un client et son compte
                 2. Effectuer un dépot
                 3. Effectuer un retrait
-                4. Afficher un compte
-                5. Quitter
+                4. Créer un compte supplémentaire pour un client
+                5. Afficher un compte
+                6. Afficher le profil complet d'un client
+                7. Quitter
                 """);
         System.out.print("\n Votre choix: ");
     }
@@ -78,8 +82,25 @@ public class ConsoleInterface {
         System.out.println("\n === DEPOT D'ARGENT ===");
 
         try {
-            System.out.print("ID du compte: ");
-            int accountId = Integer.parseInt(scanner.nextLine());
+            System.out.print("ID du client: ");
+            int customerId = Integer.parseInt(scanner.nextLine());
+
+            String accountsList = controller.listCustomerAccounts(customerId);
+            if (accountsList == null) {
+                System.out.println("Client non trouvé avec l'ID: " + customerId);
+                return;
+            }
+
+            System.out.println(accountsList);
+
+            System.out.print("Sélectionnez le numéro du compte (ex: 1, 2, 3...): ");
+            int selection = Integer.parseInt(scanner.nextLine());
+
+            int accountId = controller.getAccountIdBySelection(customerId, selection);
+            if (accountId == -1) {
+                System.out.println("Sélection de compte invalide.");
+                return;
+            }
 
             System.out.print("Montant à déposer: ");
             double montant = Double.parseDouble(scanner.nextLine());
@@ -96,8 +117,25 @@ public class ConsoleInterface {
         System.out.println("\n=== RETRAIT D'ARGENT ===");
 
         try {
-            System.out.print("ID du compte: ");
-            int accountId = Integer.parseInt(scanner.nextLine());
+            System.out.print("ID du client: ");
+            int customerId = Integer.parseInt(scanner.nextLine());
+
+            String accountsList = controller.listCustomerAccounts(customerId);
+            if (accountsList == null) {
+                System.out.println("Client non trouvé avec l'ID: " + customerId);
+                return;
+            }
+
+            System.out.println(accountsList);
+
+            System.out.print("Sélectionnez le numéro du compte (ex: 1, 2, 3...): ");
+            int selection = Integer.parseInt(scanner.nextLine());
+
+            int accountId = controller.getAccountIdBySelection(customerId, selection);
+            if (accountId == -1) {
+                System.out.println("Sélection de compte invalide.");
+                return;
+            }
 
             System.out.print("Montant à retirer: ");
             double montant = Double.parseDouble(scanner.nextLine());
@@ -124,4 +162,35 @@ public class ConsoleInterface {
             System.out.println("Veuillez entrer un ID de compte valide.");
         }
     }
+
+    private void gererCreationCompteSupplementaire() {
+        System.out.println("\n=== CREATION COMPTE SUPPLEMENTAIRE ===");
+
+        try {
+            System.out.print("ID du client: ");
+            int customerId = Integer.parseInt(scanner.nextLine());
+
+            String resultat = controller.createAdditionalAccount(customerId);
+            System.out.println(resultat);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Veuillez entrer un ID de client valide.");
+        }
+    }
+
+    private void gererAffichageProfilClient() {
+        System.out.println("\n=== PROFIL CLIENT ===");
+
+        try {
+            System.out.print("ID du client: ");
+            int customerId = Integer.parseInt(scanner.nextLine());
+
+            String details = controller.getCustomerAccountsDetails(customerId);
+            System.out.println(details);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Veuillez entrer un ID de client valide.");
+        }
+    }
+
 }

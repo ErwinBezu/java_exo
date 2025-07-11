@@ -117,4 +117,62 @@ public class BankAccountDao {
             }
         }
     }
+
+    public List<BankAccount> findByCustomerId(int customerId) {
+        try {
+            connection = DataBaseManager.getConnection();
+            List<BankAccount> accounts = new ArrayList<>();
+            request = """
+                SELECT 
+                    ba.id as account_id,
+                    ba.customer_id as account_customer_id,
+                    ba.total_amount,
+                    c.id as customer_id,
+                    c.first_name,
+                    c.last_name,
+                    c.phone
+                FROM bank_accounts ba
+                JOIN customers c ON ba.customer_id = c.id
+                WHERE ba.customer_id = ?
+                ORDER BY ba.id
+            """;
+            stmt = connection.prepareStatement(request);
+            stmt.setInt(1, customerId);
+            rs = stmt.executeQuery();
+
+            while(rs.next()){
+                Customer customer = Customer.builder()
+                        .id(rs.getInt("customer_id"))
+                        .firstName(rs.getString("first_name"))
+                        .lastName(rs.getString("last_name"))
+                        .phone(rs.getString("phone"))
+                        .build();
+
+                OperationDao operationDao = new OperationDao();
+                List<Operation> operations = operationDao.findByAccountId(rs.getInt("account_id"));
+
+                BankAccount account = BankAccount.builder()
+                        .id(rs.getInt("account_id"))
+                        .customerId(rs.getInt("account_customer_id"))
+                        .customer(customer)
+                        .operations(operations)
+                        .totalAmount(rs.getDouble("total_amount"))
+                        .build();
+
+                accounts.add(account);
+            }
+
+            return accounts;
+
+        }catch (SQLException e){
+            System.out.println("Error during getting bank Accounts by customer : "+e.getMessage());
+            return new ArrayList<>();
+        }finally {
+            try{
+                connection.close();
+            }catch (SQLException e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 }
