@@ -1,4 +1,4 @@
-package Entities;
+package Exo1.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

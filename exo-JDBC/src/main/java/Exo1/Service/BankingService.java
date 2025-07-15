@@ -1,12 +1,12 @@
-package Service;
+package Exo1.Service;
 
-import DAO.BankAccountDao;
-import DAO.CustomerDao;
-import DAO.OperationDao;
-import Entities.BankAccount;
-import Entities.Customer;
-import Entities.Operation;
-import Enums.OperationStatus;
+import Exo1.DAO.BankAccountDao;
+import Exo1.DAO.CustomerDao;
+import Exo1.DAO.OperationDao;
+import Exo1.Entities.BankAccount;
+import Exo1.Entities.Customer;
+import Exo1.Entities.Operation;
+import Exo1.Enums.OperationStatus;
 
 import java.util.List;
 

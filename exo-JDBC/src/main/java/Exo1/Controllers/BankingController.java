@@ -1,10 +1,10 @@
-package Controllers;
+package Exo1.Controllers;
 
-import Service.BankingService;
-import Entities.BankAccount;
-import Entities.Customer;
-import Entities.Operation;
-import Enums.OperationStatus;
+import Exo1.Service.BankingService;
+import Exo1.Entities.BankAccount;
+import Exo1.Entities.Customer;
+import Exo1.Entities.Operation;
+import Exo1.Enums.OperationStatus;
 
 import java.util.List;
 

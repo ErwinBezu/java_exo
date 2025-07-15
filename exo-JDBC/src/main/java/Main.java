@@ -1,4 +1,4 @@
-import IHM.ConsoleInterface;
+import Exo1.IHM.ConsoleInterface;
 
 public class Main {
     public static void main(String[] args) {

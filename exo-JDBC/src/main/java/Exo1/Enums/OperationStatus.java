@@ -1,4 +1,4 @@
-package Enums;
+package Exo1.Enums;
 
 public enum OperationStatus {
     DEPOSIT("DÉPÔT"),

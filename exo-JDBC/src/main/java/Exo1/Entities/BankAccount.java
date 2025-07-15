@@ -1,6 +1,6 @@
-package Entities;
+package Exo1.Entities;
 
-import Enums.OperationStatus;
+import Exo1.Enums.OperationStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

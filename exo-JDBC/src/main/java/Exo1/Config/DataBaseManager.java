@@ -1,4 +1,4 @@
-package Config;
+package Exo1.Config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

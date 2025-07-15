@@ -1,11 +1,9 @@
-package DAO;
+package Exo1.DAO;
 
-import Config.DataBaseManager;
-import Entities.Customer;
+import Exo1.Config.DataBaseManager;
+import Exo1.Entities.Customer;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class CustomerDao {

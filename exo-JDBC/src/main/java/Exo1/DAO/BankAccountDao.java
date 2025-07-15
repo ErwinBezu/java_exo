@@ -1,9 +1,9 @@
-package DAO;
+package Exo1.DAO;
 
-import Config.DataBaseManager;
-import Entities.BankAccount;
-import Entities.Customer;
-import Entities.Operation;
+import Exo1.Config.DataBaseManager;
+import Exo1.Entities.BankAccount;
+import Exo1.Entities.Customer;
+import Exo1.Entities.Operation;
 
 import java.sql.*;
 import java.util.ArrayList;

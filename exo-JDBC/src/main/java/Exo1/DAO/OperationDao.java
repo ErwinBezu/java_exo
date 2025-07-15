@@ -1,9 +1,8 @@
-package DAO;
+package Exo1.DAO;
 
-import Config.DataBaseManager;
-import Entities.Customer;
-import Entities.Operation;
-import Enums.OperationStatus;
+import Exo1.Config.DataBaseManager;
+import Exo1.Entities.Operation;
+import Exo1.Enums.OperationStatus;
 
 import java.sql.*;
 import java.util.ArrayList;

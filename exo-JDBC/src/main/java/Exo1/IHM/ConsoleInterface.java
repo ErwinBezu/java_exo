@@ -1,6 +1,6 @@
-package IHM;
+package Exo1.IHM;
 
-import Controllers.BankingController;
+import Exo1.Controllers.BankingController;
 import java.util.Scanner;
 
 public class ConsoleInterface {
