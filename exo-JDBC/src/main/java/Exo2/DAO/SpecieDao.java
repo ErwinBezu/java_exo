@@ -1,39 +1,13 @@
 package Exo2.DAO;
 
 import Exo2.Entity.Specie;
-import Exo2.Util.DatabaseManager;
 
-import javax.persistence.EntityManager;
-import java.util.List;
-
-public class SpecieDao {
-    private EntityManager em;
-
+public class SpecieDao extends GenericDao<Specie> {
     public SpecieDao() {
-        this.em = DatabaseManager.getEntityManager();
+        super(Specie.class);
     }
 
-    public Specie create(Specie specie) {
-        try {
-            em.getTransaction().begin();
-            em.persist(specie);
-            em.getTransaction().commit();
-            return specie;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            return null;
-        }
-    }
-
-    public Specie findById(Long id) {
-        return em.find(Specie.class, id);
-    }
-
-    public List<Specie> findAll() {
-        return em.createQuery("SELECT s FROM Specie s", Specie.class).getResultList();
-    }
-
-    public Specie update(Specie specie, Long id) {
+    public Specie updateSpecific(Specie specie, Long id) {
         try {
             Specie specieFound = findById(id);
             if (specieFound != null) {
@@ -48,22 +22,6 @@ public class SpecieDao {
         } catch (Exception e) {
             em.getTransaction().rollback();
             return null;
-        }
-    }
-
-    public boolean delete(Long id) {
-        try {
-            Specie specieFound = findById(id);
-            if (specieFound != null) {
-                em.getTransaction().begin();
-                em.remove(specieFound);
-                em.getTransaction().commit();
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            return false;
         }
     }
 }

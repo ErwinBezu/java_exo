@@ -2,45 +2,17 @@ package Exo2.DAO;
 
 import Exo2.Entity.Region;
 import Exo2.Entity.Specie;
-import Exo2.Util.DatabaseManager;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
-import java.util.List;
-
-public class RegionDao {
-    private EntityManager em;
+public class RegionDao extends GenericDao<Region>  {
 
     public RegionDao() {
-        this.em = DatabaseManager.getEntityManager();
+        super(Region.class);
     }
 
-    public Region create(Region region) {
+    public Region updateSpecific(Region region, long id) {
         try {
-            em.getTransaction().begin();
-            em.persist(region);
-            em.getTransaction().commit();
-            return region;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            return null;
-        }
-    }
-
-    public Region findById(Long id) {
-        return em.find(Region.class,id);
-    }
-
-    public List<Region> findAll() {
-        return em.createQuery("select r from Region r ", Region.class).getResultList();
-    }
-
-    public Region update (Region region , long id){
-        try{
             Region regionFound = findById(id);
-            if(regionFound != null){
+            if (regionFound != null) {
                 em.getTransaction().begin();
                 regionFound.setNom(region.getNom());
                 regionFound.setSurface(region.getSurface());
@@ -49,25 +21,9 @@ public class RegionDao {
                 return regionFound;
             }
             return null;
-        }catch (Exception e){
+        } catch (Exception e) {
             em.getTransaction().rollback();
             return null;
-        }
-    }
-
-    public boolean delete (long id){
-        try{
-            Region regionFound = findById(id);
-            if(regionFound != null){
-                em.getTransaction().begin();
-                em.remove(regionFound);
-                em.getTransaction().commit();
-                return true;
-            }
-            return false;
-        }catch (Exception e){
-            em.getTransaction().rollback();
-            return false;
         }
     }
 
@@ -116,5 +72,4 @@ public class RegionDao {
             return false;
         }
     }
-
 }

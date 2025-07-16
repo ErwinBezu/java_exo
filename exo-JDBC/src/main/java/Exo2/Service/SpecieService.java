@@ -63,7 +63,7 @@ public class SpecieService {
             specie.setCategory(category);
         }
 
-        return specieDao.update(specie, id);
+        return specieDao.updateSpecific(specie, id);
     }
 
     public void deleteSpecie(Long id) {

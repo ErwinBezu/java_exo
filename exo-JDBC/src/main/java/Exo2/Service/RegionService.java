@@ -61,7 +61,7 @@ public class RegionService {
         if (climat != null) {
             region.setClimat(climat);
         }
-        return regionDao.update(region, id);
+        return regionDao.updateSpecific(region, id);
     }
 
     public void deleteRegion(Long id) {

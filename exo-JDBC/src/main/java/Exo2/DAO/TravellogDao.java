@@ -3,39 +3,14 @@ package Exo2.DAO;
 import Exo2.Entity.Observation;
 import Exo2.Entity.Travellog;
 import Exo2.Enum.TravelMode;
-import Exo2.Util.DatabaseManager;
 
-import javax.persistence.EntityManager;
-import java.util.List;
-
-public class TravellogDao {
-    private EntityManager em;
+public class TravellogDao extends GenericDao<Travellog> {
 
     public TravellogDao() {
-        this.em = DatabaseManager.getEntityManager();
+        super(Travellog.class);
     }
 
-    public Travellog create(Travellog travellog) {
-        try {
-            em.getTransaction().begin();
-            em.persist(travellog);
-            em.getTransaction().commit();
-            return travellog;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            return null;
-        }
-    }
-
-    public Travellog findById(Long id) {
-        return em.find(Travellog.class, id);
-    }
-
-    public List<Travellog> findAll() {
-        return em.createQuery("SELECT t FROM Travellog t", Travellog.class).getResultList();
-    }
-
-    public Travellog update(Travellog travellog, Long id) {
+    public Travellog updateSpecific(Travellog travellog, Long id) {
         try {
             Travellog travellogFound = findById(id);
             if (travellogFound != null) {
@@ -49,22 +24,6 @@ public class TravellogDao {
         } catch (Exception e) {
             em.getTransaction().rollback();
             return null;
-        }
-    }
-
-    public boolean delete(Long id) {
-        try {
-            Travellog travellogFound = findById(id);
-            if (travellogFound != null) {
-                em.getTransaction().begin();
-                em.remove(travellogFound);
-                em.getTransaction().commit();
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            return false;
         }
     }
 

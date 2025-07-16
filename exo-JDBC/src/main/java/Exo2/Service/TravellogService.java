@@ -58,7 +58,7 @@ public class TravellogService {
             travellog.setMode(mode);
         }
 
-        return travellogDao.update(travellog, id);
+        return travellogDao.updateSpecific(travellog, id);
     }
 
     public void deleteTravellog(Long id) {
