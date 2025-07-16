@@ -1,6 +1,8 @@
 package Exo2.DAO;
 
 import Exo2.Entity.Region;
+import Exo2.Entity.Specie;
+import Exo2.Util.DatabaseManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -9,14 +11,13 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class RegionDao {
-    private final EntityManagerFactory emf;
+    private EntityManager em;
 
     public RegionDao() {
-        this.emf = Persistence.createEntityManagerFactory("Demo_Jpa");
+        this.em = DatabaseManager.getEntityManager();
     }
 
     public Region create(Region region) {
-        EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
             em.persist(region);
@@ -24,68 +25,96 @@ public class RegionDao {
             return region;
         } catch (Exception e) {
             em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
+            return null;
         }
     }
 
     public Region findById(Long id) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            Region region = em.find(Region.class, id);
-            return region;
-        } finally {
-            em.close();
-        }
+        return em.find(Region.class,id);
     }
 
     public List<Region> findAll() {
-        EntityManager em = emf.createEntityManager();
-        try {
-            TypedQuery<Region> query = em.createQuery("SELECT r FROM Region r ORDER BY r.nom", Region.class);
-            List<Region> regions = query.getResultList();
-            return regions;
-        } finally {
-            em.close();
-        }
+        return em.createQuery("select r from Region r ", Region.class).getResultList();
     }
 
-    public Region update(Region region) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            Region updatedRegion = em.merge(region);
-            em.getTransaction().commit();
-            return updatedRegion;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    public void delete(Long id) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            Region region = em.find(Region.class, id);
-            if (region != null) {
-                em.remove(region);
+    public Region update (Region region , long id){
+        try{
+            Region regionFound = findById(id);
+            if(regionFound != null){
+                em.getTransaction().begin();
+                regionFound.setNom(region.getNom());
+                regionFound.setSurface(region.getSurface());
+                regionFound.setClimat(region.getClimat());
+                em.getTransaction().commit();
+                return regionFound;
             }
-            em.getTransaction().commit();
-        } catch (Exception e) {
+            return null;
+        }catch (Exception e){
             em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
+            return null;
         }
     }
 
-    public void close() {
-        if (emf != null && emf.isOpen()) {
-            emf.close();
+    public boolean delete (long id){
+        try{
+            Region regionFound = findById(id);
+            if(regionFound != null){
+                em.getTransaction().begin();
+                em.remove(regionFound);
+                em.getTransaction().commit();
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            em.getTransaction().rollback();
+            return false;
         }
     }
+
+    public boolean addSpecieToRegion(Long regionId, Long specieId) {
+        try {
+            em.getTransaction().begin();
+
+            Region region = em.find(Region.class, regionId);
+            Specie specie = em.find(Specie.class, specieId);
+
+            if (region != null && specie != null) {
+                region.addSpecie(specie);
+                em.merge(region);
+                em.getTransaction().commit();
+                return true;
+            }
+
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            return false;
+        }
+    }
+
+    public boolean removeSpecieFromRegion(Long regionId, Long specieId) {
+        try {
+            em.getTransaction().begin();
+
+            Region region = em.find(Region.class, regionId);
+            Specie specie = em.find(Specie.class, specieId);
+
+            if (region != null && specie != null) {
+                region.getSpecieList().remove(specie);
+                specie.getRegionList().remove(region);
+                em.merge(region);
+                em.merge(specie);
+                em.getTransaction().commit();
+                return true;
+            }
+
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            return false;
+        }
+    }
+
 }
