@@ -65,33 +65,7 @@ public class ProductService {
                .orElse(null);
     }
 
-    public List<Product> filterProductsByMaxPrice(BigDecimal maxPrice) {
-//        List<Product> filteredProducts = new ArrayList<>();
-//        for(Product product : products){
-//            if(product.getPrice().compareTo(maxPrice) <= 0){
-//                filteredProducts.add(product);
-//            }
-//        }
-//        return filteredProducts;
-        return products.stream()
-                .filter(product -> product.getPrice().compareTo(maxPrice) <= 0)
-                .collect(Collectors.toList());
-    }
-
-    public List<Product> filterProductsByCategory(String category) {
-//        List<Product> filteredProducts = new ArrayList<>();
-//        for(Product product : products){
-//            if(product.getCategory().equalsIgnoreCase(category)){
-//                filteredProducts.add(product);
-//            }
-//        }
-//        return filteredProducts;
-        return products.stream()
-                .filter(product -> category != null && category.equalsIgnoreCase(product.getCategory()))
-                .collect(Collectors.toList());
-    }
-
-    public List<Product> filterProductsByCategoryAndMaxPrice(String category, BigDecimal maxPrice) {
+    public List<Product> productWithFilter(String category, BigDecimal maxPrice) {
         return products.stream()
                 .filter(p -> (category == null || p.getCategory().equalsIgnoreCase(category)) &&
                         (maxPrice == null || p.getPrice().compareTo(maxPrice) <= 0))

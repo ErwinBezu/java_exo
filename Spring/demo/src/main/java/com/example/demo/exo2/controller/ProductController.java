@@ -39,15 +39,6 @@ public class ProductController {
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice){
 
-        if (category != null && maxPrice != null) {
-            return productService.filterProductsByCategoryAndMaxPrice(category, maxPrice);
-        } else if (category != null) {
-            return productService.filterProductsByCategory(category);
-        } else if (maxPrice != null) {
-            return productService.filterProductsByMaxPrice(maxPrice);
-        } else {
-            return productService.getAllProducts();
-        }
+        return productService.productWithFilter(category, maxPrice);
     }
-
 }
