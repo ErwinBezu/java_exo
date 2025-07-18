@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.example.demo.exo1.controller;
 
-import com.example.demo.model.Todo;
-import com.example.demo.service.TodoService;
+import com.example.demo.exo1.model.Todo;
+import com.example.demo.exo1.service.TodoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
