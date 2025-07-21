@@ -86,13 +86,29 @@ public class StudentService {
         return students.stream()
                 .filter(student -> student.getLastName().toLowerCase()
                         .contains(lastName.toLowerCase().trim()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public List<Student> getStudentsByLastName(String lastName) {
-        return students.stream()
-                .filter(s -> s.getLastName().equals(lastName))
-                .toList();
+    public Student updateStudent(Student updatedStudent) {
+        Student existingStudent = getStudentById(updatedStudent.getId());
+        if (existingStudent == null) {
+            throw new IllegalArgumentException("Étudiant introuvable");
+        }
+
+        boolean emailExists = students.stream()
+                .anyMatch(s -> !s.getId().equals(updatedStudent.getId()) &&
+                        s.getEmail().equals(updatedStudent.getEmail()));
+
+        if (emailExists) {
+            throw new IllegalArgumentException("Un autre étudiant utilise déjà cet email");
+        }
+
+        existingStudent.setFirstName(updatedStudent.getFirstName());
+        existingStudent.setLastName(updatedStudent.getLastName());
+        existingStudent.setEmail(updatedStudent.getEmail());
+        existingStudent.setAge(updatedStudent.getAge());
+
+        return existingStudent;
     }
 
     public boolean deleteStudent(UUID id) {

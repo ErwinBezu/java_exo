@@ -69,6 +69,30 @@ public class StudentController {
         return "result-search";
     }
 
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable UUID id, Model model) {
+        Student student = studentService.getStudentById(id);
+        if (student != null) {
+            model.addAttribute("student", student);
+            return "edit";
+        } else {
+            return "redirect:/list";
+        }
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editStudent(@PathVariable UUID id, Student student, Model model) {
+        try {
+            student.setId(id);
+            studentService.updateStudent(student);
+            return "redirect:/detail/" + id;
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("student", student);
+            return "edit";
+        }
+    }
+
     @PostMapping("/delete/{id}")
     public String deleteStudent(@PathVariable UUID id) {
         studentService.deleteStudent(id);
