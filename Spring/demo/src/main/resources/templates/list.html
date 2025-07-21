@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des étudiants - Gestion Étudiants</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-mortarboard-fill"></i> Gestion Étudiants
+        </a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-list-ul"></i> Liste des étudiants</h2>
+            <a href="/" class="btn btn-light">
+                <i class="bi bi-house-fill"></i> Accueil
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Message de succès ou erreur si présent -->
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i>
+                <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Cas où aucun étudiant n'est enregistré -->
+            <div th:if="${#lists.isEmpty(students)}" class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <p class="lead mt-3">Aucun étudiant enregistré.</p>
+                <a href="/register" class="btn btn-success">
+                    <i class="bi bi-person-plus-fill"></i> Ajouter le premier étudiant
+                </a>
+            </div>
+
+            <!-- Liste des étudiants -->
+            <div th:unless="${#lists.isEmpty(students)}">
+                <div class="mb-3">
+                    <span class="badge bg-info fs-6">
+                        <span th:text="${#lists.size(students)}"></span> étudiant(s) trouvé(s)
+                    </span>
+                </div>
+
+                <div class="row">
+                    <div th:each="student : ${students}" class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-person-circle text-primary"></i>
+                                    <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                                </h5>
+                                <div class="d-grid">
+                                    <a th:href="@{/detail/{id}(id=${student.id})}" class="btn btn-primary">
+                                        <i class="bi bi-eye-fill"></i> Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
