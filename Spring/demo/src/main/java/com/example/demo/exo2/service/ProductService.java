@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -69,6 +68,6 @@ public class ProductService {
         return products.stream()
                 .filter(p -> (category == null || p.getCategory().equalsIgnoreCase(category)) &&
                         (maxPrice == null || p.getPrice().compareTo(maxPrice) <= 0))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 th:if="${!isFiltered}" class="text-center mb-4">Tous les Produits</h1>
+            <h1 th:if="${isFiltered}" class="text-center mb-4">Produits Filtrés</h1>
+
+            <div th:if="${isFiltered}" class="alert alert-info">
+                <strong>Filtres appliqués :</strong>
+                <span th:if="${category != null}">
+                        Catégorie: <span class="badge bg-primary" th:text="${category}"></span>
+                    </span>
+                <span th:if="${maxPrice != null}">
+                        Prix maximum: <span class="badge bg-success" th:text="${maxPrice + '€'}"></span>
+                    </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-center gap-2">
+                <a href="/products/all" class="btn btn-outline-primary"
+                   th:classappend="${!isFiltered} ? 'active' : ''">
+                    Tous les produits
+                </a>
+                <a href="/products/filter?category=Informatique" class="btn btn-outline-info">
+                    Informatique
+                </a>
+                <a href="/products/filter?category=Livres" class="btn btn-outline-info">
+                    Livres
+                </a>
+                <a href="/products/filter?category=Mobilier" class="btn btn-outline-info">
+                    Mobilier
+                </a>
+                <a href="/products/filter?maxPrice=100" class="btn btn-outline-success">
+                    Moins de 100€
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4" th:each="product : ${products}">
+            <div class="card product-card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${product.name}">Nom du produit</h5>
+                    <p class="card-text">
+                        <span class="badge bg-secondary" th:text="${product.category}">Catégorie</span>
+                    </p>
+                    <p class="card-text">
+                        <strong class="text-success" th:text="${product.price + '€'}">Prix</strong>
+                    </p>
+                    <a th:href="@{/products/detail(id=${product.id})}"
+                       class="btn btn-primary btn-sm">
+                        Voir détails
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(products)}" class="text-center">
+        <div class="alert alert-warning">
+            <h4>Aucun produit trouvé</h4>
+            <p>Aucun produit ne correspond aux critères de filtrage.</p>
+            <a href="/products/all" class="btn btn-primary">Voir tous les produits</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
