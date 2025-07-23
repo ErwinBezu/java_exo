@@ -1,7 +1,9 @@
 package com.example.demo.exo5.controller;
 
 import com.example.demo.exo5.interfaces.ICategoryService;
+import com.example.demo.exo5.mapper.CategoryMapper;
 import com.example.demo.exo5.model.dto.CategoryDTO;
+import com.example.demo.exo5.model.entity.Category;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -10,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -17,14 +20,22 @@ import java.util.UUID;
 public class CategoryController {
 
     private final ICategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryController(ICategoryService categoryService) {
+    public CategoryController(ICategoryService categoryService, CategoryMapper categoryMapper) {
         this.categoryService = categoryService;
+        this.categoryMapper = categoryMapper;
     }
 
     @GetMapping("/list")
     public String listPage(Model model) {
-        model.addAttribute("allCategorie", categoryService.getAllCategories());
+        List<Category> categories = categoryService.getAllCategories();
+
+        List<CategoryDTO> categoryDTOs = categories.stream()
+                .map(categoryMapper::toDTO)
+                .toList();
+
+        model.addAttribute("allCategorie", categoryDTOs);
         model.addAttribute("isFilter", false);
         return "listCategorie";
     }
@@ -32,8 +43,9 @@ public class CategoryController {
     @GetMapping("/detail")
     public String detailPage(@RequestParam("uuid") UUID uuid, Model model) {
         try {
-            CategoryDTO category = categoryService.getCategoryByUUID(uuid);
-            model.addAttribute("categorie", category);
+            Category category = categoryService.getCategoryByUUID(uuid);
+            CategoryDTO categoryDTO = categoryMapper.toDTO(category);
+            model.addAttribute("categorie", categoryDTO);
             return "detailCategorie";
         } catch (EntityNotFoundException e) {
             return "redirect:/categorie/list";
@@ -48,7 +60,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
-    public String submitCategory(@Validated @ModelAttribute("categorie") CategoryDTO categorie,
+    public String submitCategory(@Validated @ModelAttribute("categorie") CategoryDTO categoryDTO,
                                  BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -56,10 +68,11 @@ public class CategoryController {
         }
 
         try {
-            if (categorie.getId() != null) {
-                categoryService.updateCategory(categorie);
+            if (categoryDTO.getId() != null) {
+                Category category = categoryMapper.toEntity(categoryDTO);
+                categoryService.updateCategory(category);
             } else {
-                categoryService.addCategory(categorie);
+                categoryService.addCategory(categoryDTO.getName(), categoryDTO.getDescription());
             }
             return "redirect:/categorie/list";
         } catch (DataIntegrityViolationException e) {
@@ -70,8 +83,11 @@ public class CategoryController {
     @GetMapping("/update")
     public String updateCategory(@RequestParam("uuid") UUID uuid, Model model) {
         try {
-            CategoryDTO category = categoryService.getCategoryByUUID(uuid);
-            model.addAttribute("categorie", category);
+            Category category = categoryService.getCategoryByUUID(uuid);
+
+            CategoryDTO categoryDTO = categoryMapper.toDTO(category);
+
+            model.addAttribute("categorie", categoryDTO);
             return "addCategorie";
         } catch (EntityNotFoundException e) {
             return "redirect:/categorie/list";

@@ -1,8 +1,6 @@
 package com.example.demo.exo5.service;
 
 import com.example.demo.exo5.interfaces.IRecipeService;
-import com.example.demo.exo5.mapper.RecipeMapper;
-import com.example.demo.exo5.model.dto.RecipeDTO;
 import com.example.demo.exo5.model.entity.Category;
 import com.example.demo.exo5.model.entity.Recipe;
 import com.example.demo.exo5.repository.CategoryRepository;
@@ -21,102 +19,99 @@ public class RecipeService implements IRecipeService {
 
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
-    private final RecipeMapper recipeMapper;
 
     public RecipeService(RecipeRepository recipeRepository,
-                         CategoryRepository categoryRepository,
-                         RecipeMapper recipeMapper) {
+                         CategoryRepository categoryRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
-        this.recipeMapper = recipeMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RecipeDTO> getAllRecipies() {
-        return recipeRepository.findAll()
-                .stream()
-                .map(recipeMapper::toDTO)
-                .toList();
+    public List<Recipe> getAllRecipes() {
+        return recipeRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RecipeDTO getRecipeByUUID(UUID uuid) {
+    public Recipe getRecipeByUUID(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("L'UUID ne peut pas être null");
         }
 
-        Recipe recipe = recipeRepository.findById(uuid)
+        return recipeRepository.findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Recette non trouvée avec l'ID: " + uuid));
-
-        return recipeMapper.toDTO(recipe);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RecipeDTO getRecipeByName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+    public Recipe getRecipeByName(String nom) {
+        if (nom == null || nom.trim().isEmpty()) {
             return null;
         }
 
-        List<Recipe> recipes = recipeRepository.findByNameStartingWithIgnoreCase(name.trim());
-        return recipes.isEmpty() ? null : recipeMapper.toDTO(recipes.get(0));
+        List<Recipe> recipes = recipeRepository.findByNameStartingWithIgnoreCase(nom.trim());
+        return recipes.isEmpty() ? null : recipes.get(0);
     }
 
     @Override
-    public RecipeDTO addRecipe(RecipeDTO recipeDTO) {
-        if (recipeDTO == null) {
-            throw new IllegalArgumentException("La recette ne peut pas être null");
+    public Recipe addRecipe(String name, String ingredients, String instructions, UUID categoryId) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de la recette ne peut pas être vide");
         }
-        if (recipeDTO.getCategoryId() == null) {
+        if (ingredients == null || ingredients.trim().isEmpty()) {
+            throw new IllegalArgumentException("Les ingrédients ne peuvent pas être vides");
+        }
+        if (instructions == null || instructions.trim().isEmpty()) {
+            throw new IllegalArgumentException("Les instructions ne peuvent pas être vides");
+        }
+        if (categoryId == null) {
             throw new IllegalArgumentException("L'ID de la catégorie ne peut pas être null");
         }
 
-        if (recipeRepository.existsByName(recipeDTO.getName().trim())) {
+        if (recipeRepository.existsByName(name.trim())) {
             throw new DataIntegrityViolationException("Une recette avec ce nom existe déjà");
         }
 
-        Category category = categoryRepository.findById(recipeDTO.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + recipeDTO.getCategoryId()));
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + categoryId));
 
-        Recipe recipe = recipeMapper.toEntity(recipeDTO);
-        recipe.setName(recipe.getName().trim());
-        recipe.setIngredients(recipe.getIngredients().trim());
-        recipe.setInstructions(recipe.getInstructions().trim());
-        recipe.setCategory(category);
+        Recipe recipe = Recipe.builder()
+                .name(name.trim())
+                .ingredients(ingredients.trim())
+                .instructions(instructions.trim())
+                .category(category)
+                .build();
 
-        Recipe savedRecipe = recipeRepository.save(recipe);
-        return recipeMapper.toDTO(savedRecipe);
+        return recipeRepository.save(recipe);
     }
 
     @Override
-    public RecipeDTO updateRecipe(RecipeDTO recipeDTO) {
-        if (recipeDTO == null || recipeDTO.getId() == null) {
+    public Recipe updateRecipe(Recipe recipe, UUID categoryId) {
+        if (recipe == null || recipe.getId() == null) {
             throw new IllegalArgumentException("La recette et son ID ne peuvent pas être null");
         }
-        if (recipeDTO.getCategoryId() == null) {
+        if (categoryId == null) {
             throw new IllegalArgumentException("L'ID de la catégorie ne peut pas être null");
         }
 
-        Recipe existingRecipe = recipeRepository.findById(recipeDTO.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Recette non trouvée avec l'ID: " + recipeDTO.getId()));
+        Recipe existingRecipe = recipeRepository.findById(recipe.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Recette non trouvée avec l'ID: " + recipe.getId()));
 
-        if (!existingRecipe.getName().equals(recipeDTO.getName()) &&
-                recipeRepository.existsByName(recipeDTO.getName())) {
+        if (!existingRecipe.getName().equals(recipe.getName()) &&
+                recipeRepository.existsByName(recipe.getName())) {
             throw new DataIntegrityViolationException("Une recette avec ce nom existe déjà");
         }
 
-        Category category = categoryRepository.findById(recipeDTO.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + recipeDTO.getCategoryId()));
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + categoryId));
 
-        existingRecipe.setName(recipeDTO.getName().trim());
-        existingRecipe.setIngredients(recipeDTO.getIngredients().trim());
-        existingRecipe.setInstructions(recipeDTO.getInstructions().trim());
+        existingRecipe.setName(recipe.getName().trim());
+        existingRecipe.setIngredients(recipe.getIngredients().trim());
+        existingRecipe.setInstructions(recipe.getInstructions().trim());
         existingRecipe.setCategory(category);
 
-        Recipe savedRecipe = recipeRepository.save(existingRecipe);
-        return recipeMapper.toDTO(savedRecipe);
+        return recipeRepository.save(existingRecipe);
     }
 
     @Override

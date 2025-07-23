@@ -1,8 +1,6 @@
 package com.example.demo.exo5.service;
 
 import com.example.demo.exo5.interfaces.ICategoryService;
-import com.example.demo.exo5.mapper.CategoryMapper;
-import com.example.demo.exo5.model.dto.CategoryDTO;
 import com.example.demo.exo5.model.entity.Category;
 import com.example.demo.exo5.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,84 +16,77 @@ import java.util.UUID;
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(categoryMapper::toDTO)
-                .toList();
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CategoryDTO getCategoryByUUID(UUID uuid) {
+    public Category getCategoryByUUID(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("L'UUID ne peut pas être null");
         }
 
-        Category category = categoryRepository.findById(uuid)
+        return categoryRepository.findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + uuid));
-
-        return categoryMapper.toDTO(category);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CategoryDTO getCategoryByName(String name) {
+    public Category getCategoryByName(String name) {
         if (name == null || name.trim().isEmpty()) {
             return null;
         }
 
-        return categoryRepository.findByName(name)
-                .map(categoryMapper::toDTO)
-                .orElse(null);
+        return categoryRepository.findByName(name).orElse(null);
     }
 
     @Override
-    public CategoryDTO addCategory(CategoryDTO categoryDTO) {
-        if (categoryDTO == null) {
-            throw new IllegalArgumentException("La catégorie ne peut pas être null");
+    public Category addCategory(String name, String description) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de la catégorie ne peut pas être vide");
+        }
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("La description ne peut pas être vide");
         }
 
-        if (categoryRepository.existsByName(categoryDTO.getName().trim())) {
+        if (categoryRepository.existsByName(name.trim())) {
             throw new DataIntegrityViolationException("Une catégorie avec ce nom existe déjà");
         }
 
-        Category category = categoryMapper.toEntity(categoryDTO);
-        category.setName(category.getName().trim());
-        category.setDescription(category.getDescription().trim());
+        Category category = Category.builder()
+                .name(name.trim())
+                .description(description.trim())
+                .build();
 
-        Category savedCategory = categoryRepository.save(category);
-        return categoryMapper.toDTO(savedCategory);
+        return categoryRepository.save(category);
     }
 
     @Override
-    public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
-        if (categoryDTO == null || categoryDTO.getId() == null) {
+    public Category updateCategory(Category category) {
+        if (category == null || category.getId() == null) {
             throw new IllegalArgumentException("La catégorie et son ID ne peuvent pas être null");
         }
 
-        Category existingCategory = categoryRepository.findById(categoryDTO.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + categoryDTO.getId()));
+        Category existingCategory = categoryRepository.findById(category.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée avec l'ID: " + category.getId()));
 
-        if (!existingCategory.getName().equals(categoryDTO.getName()) &&
-                categoryRepository.existsByName(categoryDTO.getName())) {
+        if (!existingCategory.getName().equals(category.getName()) &&
+                categoryRepository.existsByName(category.getName())) {
             throw new DataIntegrityViolationException("Une catégorie avec ce nom existe déjà");
         }
 
-        existingCategory.setName(categoryDTO.getName().trim());
-        existingCategory.setDescription(categoryDTO.getDescription().trim());
+        existingCategory.setName(category.getName().trim());
+        existingCategory.setDescription(category.getDescription().trim());
 
-        Category savedCategory = categoryRepository.save(existingCategory);
-        return categoryMapper.toDTO(savedCategory);
+        return categoryRepository.save(existingCategory);
     }
 
     @Override

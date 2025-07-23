@@ -2,8 +2,12 @@ package com.example.demo.exo5.controller;
 
 import com.example.demo.exo5.interfaces.ICategoryService;
 import com.example.demo.exo5.interfaces.IRecipeService;
+import com.example.demo.exo5.mapper.CategoryMapper;
+import com.example.demo.exo5.mapper.RecipeMapper;
 import com.example.demo.exo5.model.dto.CategoryDTO;
 import com.example.demo.exo5.model.dto.RecipeDTO;
+import com.example.demo.exo5.model.entity.Category;
+import com.example.demo.exo5.model.entity.Recipe;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -23,21 +27,34 @@ public class RecipeController {
 
     private final IRecipeService recipeService;
     private final ICategoryService categoryService;
+    private final RecipeMapper recipeMapper;
+    private final CategoryMapper categoryMapper;
 
-    public RecipeController(IRecipeService recipeService, ICategoryService categoryService) {
+    public RecipeController(IRecipeService recipeService,
+                            ICategoryService categoryService,
+                            RecipeMapper recipeMapper,
+                            CategoryMapper categoryMapper) {
         this.recipeService = recipeService;
         this.categoryService = categoryService;
+        this.recipeMapper = recipeMapper;
+        this.categoryMapper = categoryMapper;
     }
 
     @GetMapping("/list")
     public String listPage(Model model) {
-        List<CategoryDTO> allCategories = categoryService.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
+        List<Recipe> allRecipes = recipeService.getAllRecipes();
+
         Map<UUID, String> categories = new HashMap<>();
-        for (CategoryDTO category : allCategories) {
+        for (Category category : allCategories) {
             categories.put(category.getId(), category.getName());
         }
 
-        model.addAttribute("allRecette", recipeService.getAllRecipies());
+        List<RecipeDTO> recipeDTOs = allRecipes.stream()
+                .map(recipeMapper::toDTO)
+                .toList();
+
+        model.addAttribute("allRecette", recipeDTOs);
         model.addAttribute("allCategory", categories);
         model.addAttribute("isFilter", false);
         return "listRecette";
@@ -46,9 +63,10 @@ public class RecipeController {
     @GetMapping("/detail")
     public String detailPage(@RequestParam("uuid") UUID uuid, Model model) {
         try {
-            RecipeDTO recette = recipeService.getRecipeByUUID(uuid);
-            model.addAttribute("recette", recette);
-            model.addAttribute("categorie", recette.getCategoryName());
+            Recipe recipe = recipeService.getRecipeByUUID(uuid);
+            RecipeDTO recipeDTO = recipeMapper.toDTO(recipe);
+            model.addAttribute("recette", recipeDTO);
+            model.addAttribute("categorie", recipeDTO.getCategoryName());
             return "detailRecette";
         } catch (EntityNotFoundException e) {
             return "redirect:/recette/list";
@@ -58,30 +76,50 @@ public class RecipeController {
     @GetMapping("/add")
     public String addRecipe(Model model) {
         RecipeDTO recette = new RecipeDTO();
+
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryDTO> categoryDTOs = categories.stream()
+                .map(categoryMapper::toDTO)
+                .toList();
+
         model.addAttribute("recette", recette);
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("categories", categoryDTOs);
         return "addRecette";
     }
 
     @PostMapping("/add")
-    public String submitRecipe(@Validated @ModelAttribute("recette") RecipeDTO recette,
+    public String submitRecipe(@Validated @ModelAttribute("recette") RecipeDTO recipeDTO,
                                BindingResult bindingResult,
                                Model model) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", categoryService.getAllCategories());
+            List<Category> categories = categoryService.getAllCategories();
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                    .map(categoryMapper::toDTO)
+                    .toList();
+            model.addAttribute("categories", categoryDTOs);
             return "addRecette";
         }
 
         try {
-            if (recette.getId() != null) {
-                recipeService.updateRecipe(recette);
+            if (recipeDTO.getId() != null) {
+                Recipe recipe = recipeMapper.toEntity(recipeDTO);
+                recipeService.updateRecipe(recipe, recipeDTO.getCategoryId());
             } else {
-                recipeService.addRecipe(recette);
+                recipeService.addRecipe(
+                        recipeDTO.getName(),
+                        recipeDTO.getIngredients(),
+                        recipeDTO.getInstructions(),
+                        recipeDTO.getCategoryId()
+                );
             }
             return "redirect:/recette/list";
         } catch (DataIntegrityViolationException | EntityNotFoundException e) {
-            model.addAttribute("categories", categoryService.getAllCategories());
+            List<Category> categories = categoryService.getAllCategories();
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                    .map(categoryMapper::toDTO)
+                    .toList();
+            model.addAttribute("categories", categoryDTOs);
             return "addRecette";
         }
     }
@@ -89,9 +127,15 @@ public class RecipeController {
     @GetMapping("/update")
     public String updateRecipe(@RequestParam("uuid") UUID uuid, Model model) {
         try {
-            RecipeDTO recette = recipeService.getRecipeByUUID(uuid);
-            model.addAttribute("recette", recette);
-            model.addAttribute("categories", categoryService.getAllCategories());
+            Recipe recipe = recipeService.getRecipeByUUID(uuid);
+            RecipeDTO recipeDTO = recipeMapper.toDTO(recipe);
+            List<Category> categories = categoryService.getAllCategories();
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                    .map(categoryMapper::toDTO)
+                    .toList();
+
+            model.addAttribute("recette", recipeDTO);
+            model.addAttribute("categories", categoryDTOs);
             return "addRecette";
         } catch (EntityNotFoundException e) {
             return "redirect:/recette/list";
