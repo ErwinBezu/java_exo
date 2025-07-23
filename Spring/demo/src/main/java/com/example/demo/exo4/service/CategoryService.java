@@ -46,4 +46,12 @@ public class CategoryService extends AbstractCrudService<Category> {
     public void deleteCategoryById(UUID id) {
         deleteById(id);
     }
+
+    public Map<UUID, String> getCategoryIdNameMap() {
+        Map<UUID, String> map = new LinkedHashMap<>();
+        for (Category category : findAllCategories()) {
+            map.put(category.getId(), category.getName());
+        }
+        return map;
+    }
 }

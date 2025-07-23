@@ -51,7 +51,7 @@
                             <h5 class="card-title mb-0" th:text="${recipe.name}">Nom de la recette</h5>
                             <small class="text-muted">
                                 <i class="fas fa-tag"></i>
-                                <span th:text="${categoryService.getCategoryById(recipe.categoryId)?.name ?: 'Catégorie inconnue'}">Catégorie</span>
+                                <span th:text="${categoryMap[recipe.categoryId] ?: 'Catégorie inconnue'}">Catégorie</span>
                             </small>
                         </div>
                         <div class="card-body">

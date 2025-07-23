@@ -29,7 +29,7 @@ public class RecipeController {
     @GetMapping("recipes")
     public String listRecipes(Model model) {
         model.addAttribute("recipes", recipeService.findAllRecipes());
-        model.addAttribute("categoryService", categoryService);
+        model.addAttribute("categoryMap", categoryService.getCategoryIdNameMap());
         return "recipes/list";
     }
 
