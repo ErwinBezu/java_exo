@@ -45,12 +45,12 @@ public class RecipeService implements IRecipeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Recipe getRecipeByName(String nom) {
-        if (nom == null || nom.trim().isEmpty()) {
+    public Recipe getRecipeByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
             return null;
         }
 
-        List<Recipe> recipes = recipeRepository.findByNameStartingWithIgnoreCase(nom.trim());
+        List<Recipe> recipes = recipeRepository.findByNameStartingWithIgnoreCase(name.trim());
         return recipes.isEmpty() ? null : recipes.get(0);
     }
 
