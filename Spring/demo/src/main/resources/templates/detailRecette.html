@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Recette : ' + ${recette.name}">Détail Recette</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .recipe-content {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .ingredient-list, .instruction-list {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+        }
+        .print-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-button { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary no-print">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-utensils"></i> Mes Recettes</a>
+        <div class="navbar-nav">
+            <a class="nav-link active" href="/recette/list">Recettes</a>
+            <a class="nav-link" href="/categorie/list">Catégories</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="mb-1">
+                                <i class="fas fa-book-open me-3"></i>
+                                <span th:text="${recette.name}"></span>
+                            </h1>
+                            <div class="d-flex align-items-center mt-2">
+                                    <span class="badge bg-success fs-6 me-3">
+                                        <i class="fas fa-tag me-1"></i>
+                                        <span th:text="${categorie}"></span>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="no-print">
+                            <div class="btn-group-vertical">
+                                <a th:href="@{/recette/update(uuid=${recette.id})}"
+                                   class="btn btn-warning btn-sm mb-1">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a th:href="@{/recette/delete(uuid=${recette.id})}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="recipe-content p-4 rounded mb-4 h-100">
+                                <h3 class="text-info mb-4">
+                                    <i class="fas fa-shopping-basket me-2"></i>
+                                    Ingrédients
+                                </h3>
+                                <div class="ingredient-list">
+                                        <pre th:text="${recette.ingredients}"
+                                             class="mb-0 border-0 bg-transparent p-0"
+                                             style="white-space: pre-wrap; font-family: 'Georgia', serif; font-size: 1.1rem;"></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="recipe-content p-4 rounded mb-4 h-100">
+                                <h3 class="text-warning mb-4">
+                                    <i class="fas fa-list-ol me-2"></i>
+                                    Instructions de préparation
+                                </h3>
+                                <div class="instruction-list">
+                                        <pre th:text="${recette.instructions}"
+                                             class="mb-0 border-0 bg-transparent p-0"
+                                             style="white-space: pre-wrap; font-family: 'Georgia', serif; font-size: 1.1rem;"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 no-print">
+                        <div class="col-12">
+                            <div class="alert alert-light border">
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-clock fa-2x text-primary mb-2"></i>
+                                        <h6>Temps de préparation</h6>
+                                        <small class="text-muted">Consultez les instructions</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                        <h6>Nombre de portions</h6>
+                                        <small class="text-muted">Selon les ingrédients</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                        <h6>Difficulté</h6>
+                                        <small class="text-muted">Selon la complexité</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 no-print">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="/recette/list" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                                </a>
+                                <div>
+                                    <button onclick="window.print()" class="btn btn-outline-primary btn-lg me-2">
+                                        <i class="fas fa-print me-2"></i> Imprimer
+                                    </button>
+                                    <a th:href="@{/recette/update(uuid=${recette.id})}"
+                                       class="btn btn-primary btn-lg">
+                                        <i class="fas fa-edit me-2"></i> Modifier cette recette
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button onclick="window.print()" class="btn btn-primary print-button rounded-circle" title="Imprimer la recette">
+    <i class="fas fa-print"></i>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
