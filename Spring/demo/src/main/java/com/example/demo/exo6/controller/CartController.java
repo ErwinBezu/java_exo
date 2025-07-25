@@ -1,6 +1,7 @@
 package com.example.demo.exo6.controller;
 
 import com.example.demo.exo6.interfaces.ICartService;
+import com.example.demo.exo6.model.dto.CartDTO;
 import com.example.demo.exo6.model.dto.CartItemDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,41 +14,41 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
-    private ICartService cartService;
+    private final ICartService cartService;
 
     public CartController(ICartService cartService) {
         this.cartService = cartService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<CartItemDTO>> getAllCartItems() {
-        return new ResponseEntity<>(cartService.getAllCartItems(), HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<CartDTO> createCart() {
+        CartDTO createdCart = cartService.createCart();
+        return new ResponseEntity<>(createdCart, HttpStatus.CREATED);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<CartItemDTO> addCartItem(@Validated @RequestBody CartItemDTO cartItemDTO) {
-        CartItemDTO addedItem;
-        try {
-            addedItem = cartService.addCartItem(cartItemDTO);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @GetMapping("/{cartId}")
+    public ResponseEntity<List<CartItemDTO>> getAllCartItems(@PathVariable UUID cartId) {
+        List<CartItemDTO> cartItems = cartService.getAllCartItems(cartId);
+        return new ResponseEntity<>(cartItems, HttpStatus.OK);
+    }
+
+    @PostMapping("/{cartId}/add")
+    public ResponseEntity<CartItemDTO> addCartItem(@PathVariable UUID cartId,
+                                                   @Validated @RequestBody CartItemDTO cartItemDTO) {
+        CartItemDTO addedItem = cartService.addCartItem(cartId, cartItemDTO);
         return new ResponseEntity<>(addedItem, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/remove/{id}")
-    public ResponseEntity removeCartItem(@PathVariable UUID id) {
-        try {
-            cartService.removeCartItem(id);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.OK);
+    @DeleteMapping("/{cartId}/remove/{cartItemId}")
+    public ResponseEntity<Void> removeCartItem(@PathVariable UUID cartId,
+                                               @PathVariable UUID cartItemId) {
+        cartService.removeCartItem(cartId, cartItemId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/clear")
-    public ResponseEntity clearCart() {
-        cartService.clearCart();
-        return new ResponseEntity(HttpStatus.OK);
+    @DeleteMapping("/{cartId}/clear")
+    public ResponseEntity<Void> clearCart(@PathVariable UUID cartId) {
+        cartService.clearCart(cartId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

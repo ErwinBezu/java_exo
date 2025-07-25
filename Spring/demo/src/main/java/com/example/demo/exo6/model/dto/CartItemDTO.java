@@ -16,10 +16,10 @@ public class CartItemDTO {
     private String description;
     private Double price;
 
-    @NotNull(message = "La quantité est obligatoire")
-    @Positive(message = "La quantité doit être positive")
+    @NotNull(message = "{validation.cart.item.quantity.not.null}")
+    @Positive(message = "{validation.cart.item.quantity.positive}")
     private Integer quantity;
 
-    @NotNull(message = "L'ID du meuble est obligatoire")
+    @NotNull(message = "{validation.cart.item.furniture.id.not.null}")
     private UUID furnitureId;
 }

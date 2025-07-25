@@ -7,7 +7,8 @@ import java.util.UUID;
 
 public interface IFurnitureService {
     List<FurnitureDTO> getAllFurniture();
-    FurnitureDTO getFurnitureById(UUID id) throws Exception;
+    FurnitureDTO getFurnitureById(UUID id);
     FurnitureDTO saveFurniture(FurnitureDTO furnitureDTO);
-    void deleteFurniture(UUID id) throws Exception;
+    FurnitureDTO updateFurniture(UUID id, FurnitureDTO furnitureDTO);
+    void deleteFurniture(UUID id);
 }

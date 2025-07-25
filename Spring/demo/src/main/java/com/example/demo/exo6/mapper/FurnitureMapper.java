@@ -10,6 +10,8 @@ import java.util.List;
 public class FurnitureMapper {
 
     public static FurnitureDTO furnitureToFurnitureDTO(Furniture furniture) {
+        if (furniture == null) return null;
+
         return new FurnitureDTO(
                 furniture.getId(),
                 furniture.getName(),
@@ -19,16 +21,19 @@ public class FurnitureMapper {
         );
     }
 
-
     public static List<FurnitureDTO> furnituresToFurnitureDTOs(List<Furniture> furnitureList) {
+        if (furnitureList == null) return null;
+
         return furnitureList.stream()
                 .map(FurnitureMapper::furnitureToFurnitureDTO)
                 .toList();
     }
 
     public static Furniture furnitureDTOToFurniture(FurnitureDTO furnitureDTO) {
+        if (furnitureDTO == null) return null;
+
         return new Furniture(
-                null,
+                furnitureDTO.getId(),
                 furnitureDTO.getName(),
                 furnitureDTO.getDescription(),
                 furnitureDTO.getPrice(),
@@ -38,6 +43,8 @@ public class FurnitureMapper {
     }
 
     public static List<Furniture> furnitureDTOsToFurnitures(List<FurnitureDTO> furnitureDTOs) {
+        if (furnitureDTOs == null) return null;
+
         return furnitureDTOs.stream()
                 .map(FurnitureMapper::furnitureDTOToFurniture)
                 .toList();

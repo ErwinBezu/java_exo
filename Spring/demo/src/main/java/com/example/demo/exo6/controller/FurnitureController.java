@@ -13,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/furniture")
 public class FurnitureController {
-    private IFurnitureService furnitureService;
+    private final IFurnitureService furnitureService;
 
     public FurnitureController(IFurnitureService furnitureService) {
         this.furnitureService = furnitureService;
@@ -21,34 +21,32 @@ public class FurnitureController {
 
     @GetMapping
     public ResponseEntity<List<FurnitureDTO>> getAllFurniture() {
-        return new ResponseEntity<>(furnitureService.getAllFurniture(), HttpStatus.OK);
+        List<FurnitureDTO> furnitures = furnitureService.getAllFurniture();
+        return new ResponseEntity<>(furnitures, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FurnitureDTO> getFurnitureById(@PathVariable UUID id) {
-        FurnitureDTO furnitureDTO;
-        try {
-            furnitureDTO = furnitureService.getFurnitureById(id);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        FurnitureDTO furnitureDTO = furnitureService.getFurnitureById(id);
         return new ResponseEntity<>(furnitureDTO, HttpStatus.OK);
     }
 
-
     @PostMapping
     public ResponseEntity<FurnitureDTO> saveFurniture(@Validated @RequestBody FurnitureDTO furnitureDTO) {
-        return new ResponseEntity<>(furnitureService.saveFurniture(furnitureDTO), HttpStatus.CREATED);
+        FurnitureDTO savedFurniture = furnitureService.saveFurniture(furnitureDTO);
+        return new ResponseEntity<>(savedFurniture, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FurnitureDTO> updateFurniture(@PathVariable UUID id,
+                                                        @Validated @RequestBody FurnitureDTO furnitureDTO) {
+        FurnitureDTO updatedFurniture = furnitureService.updateFurniture(id, furnitureDTO);
+        return new ResponseEntity<>(updatedFurniture, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteFurniture(@PathVariable UUID id) {
-        try {
-            furnitureService.deleteFurniture(id);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Void> deleteFurniture(@PathVariable UUID id) {
+        furnitureService.deleteFurniture(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

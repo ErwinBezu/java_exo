@@ -1,5 +1,7 @@
 package com.example.demo.exo6.service;
 
+import com.example.demo.exo6.configs.MessageService;
+import com.example.demo.exo6.exceptions.FurnitureNotFoundException;
 import com.example.demo.exo6.interfaces.IFurnitureService;
 import com.example.demo.exo6.mapper.FurnitureMapper;
 import com.example.demo.exo6.model.dto.FurnitureDTO;
@@ -13,23 +15,23 @@ import java.util.UUID;
 @Service
 public class FurnitureService implements IFurnitureService {
     private FurnitureRepository furnitureRepository;
+    private MessageService messageService;
 
-    public FurnitureService(FurnitureRepository furnitureRepository) {
+    public FurnitureService(FurnitureRepository furnitureRepository, MessageService messageService) {
         this.furnitureRepository = furnitureRepository;
+        this.messageService = messageService;
     }
 
     @Override
     public List<FurnitureDTO> getAllFurniture() {
-        List<Furniture> furnitures = furnitureRepository.findAll();
-        return FurnitureMapper.furnituresToFurnitureDTOs(furnitures);
+        return FurnitureMapper.furnituresToFurnitureDTOs(furnitureRepository.findAll());
     }
 
     @Override
-    public FurnitureDTO getFurnitureById(UUID id) throws Exception {
-        Furniture furniture = furnitureRepository.findById(id).orElse(null);
-
-        if (furniture == null)
-            throw new Exception("Le meuble d'ID : " + id + " n'existe pas.");
+    public FurnitureDTO getFurnitureById(UUID id) {
+        Furniture furniture = furnitureRepository.findById(id)
+                .orElseThrow(() -> new FurnitureNotFoundException(
+                        messageService.getMessage("exception.furniture.not.found", id)));
 
         return FurnitureMapper.furnitureToFurnitureDTO(furniture);
     }
@@ -40,11 +42,29 @@ public class FurnitureService implements IFurnitureService {
         return FurnitureMapper.furnitureToFurnitureDTO(furnitureSaved);
     }
 
-    @Override
-    public void deleteFurniture(UUID id) throws Exception {
-        if (!furnitureRepository.existsById(id))
-            throw new Exception("Le meuble n'existe pas.");
+    public FurnitureDTO updateFurniture(UUID id, FurnitureDTO furnitureDTO) {
+        if (!furnitureRepository.existsById(id)) {
+            throw new FurnitureNotFoundException(
+                    messageService.getMessage("exception.furniture.not.found", id));
+        }
 
+        FurnitureDTO furnitureToUpdate = new FurnitureDTO(
+                id,
+                furnitureDTO.getName(),
+                furnitureDTO.getDescription(),
+                furnitureDTO.getPrice(),
+                furnitureDTO.getStock()
+        );
+
+        return saveFurniture(furnitureToUpdate);
+    }
+
+    @Override
+    public void deleteFurniture(UUID id) {
+        if (!furnitureRepository.existsById(id)) {
+            throw new FurnitureNotFoundException(
+                    messageService.getMessage("exception.furniture.not.found", id));
+        }
         furnitureRepository.deleteById(id);
     }
 }

@@ -22,5 +22,10 @@ public class CartItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "furniture_id", nullable = false)
     private Furniture furniture;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", nullable = true)
+    private Cart cart;
+
     private int quantity;
 }

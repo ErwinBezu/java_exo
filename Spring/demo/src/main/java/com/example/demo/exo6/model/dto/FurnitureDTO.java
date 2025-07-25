@@ -18,16 +18,16 @@ import java.util.UUID;
 public class FurnitureDTO {
     private UUID id;
 
-    @NotBlank(message = "Le nom ne peut pas être vide")
+    @NotBlank(message = "{validation.furniture.name.not.blank}")
     private String name;
 
     private String description;
 
-    @NotNull(message = "Le prix est obligatoire")
-    @Positive(message = "Le prix doit être positif")
+    @NotNull(message = "{validation.furniture.price.not.null}")
+    @Positive(message = "{validation.furniture.price.positive}")
     private Double price;
 
-    @NotNull(message = "Le stock est obligatoire")
-    @PositiveOrZero(message = "Le stock doit être positif ou zéro")
+    @NotNull(message = "{validation.furniture.stock.not.null}")
+    @PositiveOrZero(message = "{validation.furniture.stock.positive.or.zero}")
     private Integer stock;
 }
